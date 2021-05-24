@@ -1,6 +1,6 @@
 # ServerHeraldoV4
 
-## Pasos para instalar:
+## Tener en cuenta:
 
 ### Tener instalado:
 	python3

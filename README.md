@@ -13,7 +13,7 @@
     source venv/bin/activate
 
 ### instalar: flask y sqlalchemy
-    pip3 install flask flask-sqlalchemy sqlalchemy
+    pip3 install flask flask-sqlalchemy sqlalchemy flask-cors
 
 ### configuración de flask
     export FLASK_APP=src/app.py

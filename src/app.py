@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 # configuracion de base de datos
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -19,7 +21,7 @@ from controllers.cCategoria import CategoriaController
 from controllers.cNoticia import NoticiaController
 
 # buscar usuario
-@app.route('/usuarios/login', methods = ["POST"])
+@app.route('/api/usuarios/login', methods = ["POST"])
 def getUsuario():
     # recoger información
     username = request.form.get("username")
@@ -33,7 +35,7 @@ def getUsuario():
         return jsonify({ "data": [], "mensaje": "Campos vacios", "error": True })
 
 # guardar usuario
-@app.route('/usuarios/guardar', methods = ["POST"])
+@app.route('/api/usuarios/guardar', methods = ["POST"])
 def setUsuario():
     # recoger información
     nombre = request.form.get("nombre")
@@ -51,28 +53,28 @@ def setUsuario():
         return jsonify({ "data": [], "mensaje": "Campos vacios", "error": True })
 
 # buscar categorias
-@app.route('/categorias', methods = ["POST"])
+@app.route('/api/categorias', methods = ["POST"])
 def getCategorias():
     # buscar información
     data = CategoriaController.getCategorias()
     return jsonify({ "data": data, "mensaje": "Buscado", "error": False })
 
 # buscar noticias
-@app.route('/noticias', methods = ["POST"])
+@app.route('/api/noticias', methods = ["POST"])
 def getNoticias():
     # buscar información
     data = NoticiaController.getNoticias()
     return jsonify({ "data": data, "mensaje": "Buscado", "error": False })
 
 # buscar noticias visibles
-@app.route('/noticias/visibles', methods = ["POST"])
+@app.route('/api/noticias/visibles', methods = ["POST"])
 def getNoticiasVisibles():
     # buscar información
     data = NoticiaController.getNoticiasVisibles()
     return jsonify({ "data": data, "mensaje": "Buscado", "error": False })
 
 # guardar noticia
-@app.route('/noticias/guardar', methods = ["POST"])
+@app.route('/api/noticias/guardar', methods = ["POST"])
 def setNoticia():
     # recoger información
     nombreNoticia = request.form.get("nombreNoticia")
@@ -87,12 +89,15 @@ def setNoticia():
     if (nombreNoticia and descripcion and nombrePeriodista and visible and idCategoria and horaNoticia and imgNoticia and resumen):
         # guardar información
         data = NoticiaController.setNoticia(nombreNoticia=nombreNoticia, descripcion=descripcion, nombrePeriodista=nombrePeriodista, visible=visible, idCategoria=idCategoria, horaNoticia=horaNoticia, imgNoticia=imgNoticia, resumen=resumen)
-        return jsonify({ "data": data, "mensaje": "Guardado", "error": False })
+        if (data):
+            return jsonify({ "data": NoticiaController.getNoticias(), "mensaje": "Guardado", "error": False })
+        else:
+            return jsonify({ "data": [], "mensaje": "Error en BD", "error": True })
     else:
         return jsonify({ "data": [], "mensaje": "Campos vacios", "error": True })
 
 # actualizar noticia
-@app.route('/noticias/editar', methods = ["POST"])
+@app.route('/api/noticias/editar', methods = ["POST"])
 def setNoticiaUpdate():
     # recoger información
     id = request.form.get("id")
@@ -109,14 +114,14 @@ def setNoticiaUpdate():
         # editar información
         data = NoticiaController.setNoticiaUpdate(id=id, nombreNoticia=nombreNoticia, descripcion=descripcion, nombrePeriodista=nombrePeriodista, visible=visible, idCategoria=idCategoria, horaNoticia=horaNoticia, imgNoticia=imgNoticia, resumen=resumen)
         if (data):
-            return jsonify({ "data": data, "mensaje": "Editado", "error": False })
+            return jsonify({ "data": NoticiaController.getNoticias(), "mensaje": "Editado", "error": False })
         else:
             return jsonify({ "data": [], "mensaje": "No existe", "error": True })
     else:
         return jsonify({ "data": [], "mensaje": "Campos vacios", "error": True })
 
 # eliminar noticia
-@app.route('/noticias/eliminar', methods = ["POST"])
+@app.route('/api/noticias/eliminar', methods = ["POST"])
 def setNoticiaDelete():
     # recoger información
     id = request.form.get("id")
@@ -125,7 +130,7 @@ def setNoticiaDelete():
         # eliminar información
         data = NoticiaController.setNoticiaDelete(id=id)
         if (data):
-            return jsonify({ "data": data, "mensaje": "Eliminado", "error": False })
+            return jsonify({ "data": NoticiaController.getNoticias(), "mensaje": "Eliminado", "error": False })
         else:
             return jsonify({ "data": [], "mensaje": "No existe", "error": True })
     else:

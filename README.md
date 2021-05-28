@@ -19,7 +19,7 @@
     export FLASK_APP=src/app.py
 
 ### correr migracion:
-    python src/migrate.py
+    python3 src/migrate.py
 
 ### correr flask:
     flask run
